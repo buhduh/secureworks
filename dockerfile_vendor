@@ -1,0 +1,14 @@
+######vendor######
+FROM golang:1.11 as vendor
+
+ARG VENDOR_DIR=${VENDOR_DIR}
+ARG APP_SRC=${APP_SRC}
+
+RUN mkdir /root/volume
+VOLUME /root/volume
+
+COPY ${APP_SRC} ${VENDOR_DIR}/src
+#COPY ${APP_SRC} /root/volume
+WORKDIR ${VENDOR_DIR}/src
+#RUN go mod init secureworks
+#RUN go mod vendor
