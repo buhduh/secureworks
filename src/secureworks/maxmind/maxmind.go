@@ -17,9 +17,9 @@ type realDB struct {
 
 type maxmindRecord struct {
 	Location struct {
-		Latitude  float32 `maxminddb:"latitude"`
-		Longitude float32 `maxminddb:"longitude"`
-		Radius    int     `maxminddb:"accuracy_radius"`
+		Latitude  float64 `maxminddb:"latitude"`
+		Longitude float64 `maxminddb:"longitude"`
+		Radius    uint    `maxminddb:"accuracy_radius"`
 	} `maxminddb:"location"`
 }
 

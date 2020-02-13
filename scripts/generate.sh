@@ -8,7 +8,7 @@ package constants
 const (
   IP_DB string  = "$CONT_IP_DB"
   SQL_DB        = "$SQL_DB"
-  CREATE_DB_SQL = "$CREATE_DB_SQL"
+  PORT_STR      = "$PORT_STR"
 )
 
 EOF

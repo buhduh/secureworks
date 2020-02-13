@@ -30,10 +30,10 @@ func TestGetLocation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed returning location '%s' with error '%s'.", ipStr, err)
 	}
-	if loc.Latitude != 52.139801 {
+	if loc.Latitude != 52.139800 {
 		t.Errorf(
 			"Expected latitude: %f, got %f",
-			52.139801, loc.Latitude,
+			52.139800, loc.Latitude,
 		)
 	}
 	if loc.Longitude != -0.239900 {
