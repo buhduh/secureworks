@@ -82,7 +82,7 @@ func doWork(req *RequestJSON) (*ResultJSON, error) {
 			Time:   found[2].Timestamp,
 		}
 		isSuperMan := secureworksmath.IsSuperMan(speed)
-		toRet.FromSuspicious = isSuperMan
+		toRet.ToSuspicious = isSuperMan
 		toRet.Subsequent = subsIP
 	}
 	return &toRet, nil

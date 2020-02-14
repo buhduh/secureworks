@@ -24,8 +24,8 @@ type IpAccess struct {
 
 type ResultJSON struct {
 	CurrGeo        CurrGeo  `json:"currentGeo"`
-	ToSuspicious   bool     `json:"travelToCurrentGeoSuspicious,omitempty"`
-	FromSuspicious bool     `json:"travelFromCurrentGeoSuspicious,omitempty"`
+	ToSuspicious   bool     `json:"travelToCurrentGeoSuspicious"`
+	FromSuspicious bool     `json:"travelFromCurrentGeoSuspicious"`
 	Preceding      IpAccess `json:"precedingIpAccess,omitempty"`
 	Subsequent     IpAccess `json:"subsequentIpAccess,omitempty"`
 }

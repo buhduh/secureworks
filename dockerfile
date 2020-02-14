@@ -41,7 +41,6 @@ ARG PORT=${PORT}
 ENV GEN_GO        ${GEN_GO}
 ENV CONT_IP_DB    ${CONT_IP_DB}
 
-#COPY ${APP_SRC} /go/src/
 COPY --from=vendor ${VENDOR_DIR}/src /go/src
 COPY scripts/generate.sh ${CONT_GEN_SCRIPT}
 
