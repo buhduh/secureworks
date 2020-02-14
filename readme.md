@@ -7,10 +7,6 @@ This should vendor, build, test, and deploy a docker container accessible at htt
 The port is a variable that can be modified in Makefile
 See scripts/test.sh for example curl requests
 
-$make all 
-
-Will show all available make endpoints.  For the purpose of this test no endpoints should be required.
-
 $make test
 
 To see what's available, much of it is cruft from development that I don't see the need to rip out.
