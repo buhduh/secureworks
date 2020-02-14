@@ -77,7 +77,41 @@ var dbEvents []*event.Event = []*event.Event{
 	},
 }
 
-func TestNewEvents(t *testing.T) {
+func TestDB(t *testing.T) {
+	t.Run("legit", legit)
+	t.Run("dupeEvent", dupeEvent)
+}
+
+func dupeEvent(t *testing.T) {
+	e := &event.Event{
+		IP:        "111.222",
+		Timestamp: 2,
+		UserName:  "apple",
+		EventUUID: "apple2",
+		Location: &event.Location{
+			Latitude:  111.2221,
+			Longitude: 111.2222,
+			Radius:    222,
+		},
+	}
+	db, err := NewDatabase()
+	if err != nil {
+		t.Fatalf("Need a 'real' database, got error '%s'.", err)
+	}
+	err = db.NewEvent(e)
+	if err != nil {
+		t.Errorf("dupe events are OK, got error '%s'", err)
+	}
+	allEvents, err := db.GetOrderedEventsForUser("apple")
+	if err != nil {
+		t.Fatalf("should not get an error, got '%s'", err)
+	}
+	if len(allEvents) != 3 {
+		t.Errorf("dupe events should not be added")
+	}
+}
+
+func legit(t *testing.T) {
 	db, err := NewDatabase()
 	if err != nil {
 		t.Fatalf("Need a 'real' database, got error '%s'.", err)

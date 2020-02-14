@@ -1,0 +1,2 @@
+don't fail un dupe event ids, just carry on normally
+if time = 0 is superman

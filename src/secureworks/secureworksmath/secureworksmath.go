@@ -9,8 +9,8 @@ const (
 	//I'm assuming this is close enough....
 	RADIUS_EARTH float64 = 6371
 	//dimensional analysis of km/sec to mph
-	//60sec * .621371 miles
-	KMS_TO_MPH = 37.28226
+	//3600sec * .621371 miles
+	KMS_TO_MPH = 2236.9356
 	SUPERMAN   = 500
 )
 
@@ -19,7 +19,6 @@ func degsToRads(degs float64) float64 {
 }
 
 //returns kms
-//I should test this.... ugh
 func haverSine(loc1, loc2 *event.Event) float64 {
 	lat1 := degsToRads(loc1.Location.Latitude)
 	lat2 := degsToRads(loc2.Location.Latitude)
@@ -33,14 +32,24 @@ func haverSine(loc1, loc2 *event.Event) float64 {
 	))
 }
 
-func IsSuperMan(loc1, loc2 *event.Event) bool {
-	dis := math.Abs(
-		haverSine(loc1, loc2) + float64(loc1.Location.Radius) + float64(loc2.Location.Radius),
-	)
-	deltaT := math.Abs(
-    float64(loc1.Timestamp) - float64(loc2.Timestamp),
-  )
-	return (dis/deltaT)*KMS_TO_MPH >= SUPERMAN
+//MPH
+func Speed(loc1, loc2 *event.Event) float64 {
+	haverSine := haverSine(loc1, loc2)
+	rad1 := float64(loc1.Location.Radius)
+	rad2 := float64(loc2.Location.Radius)
+	dis := haverSine - (rad1 + rad2)
+	//inside radii, within error bounds
+	if dis <= 0 {
+		dis = 0
+	}
+	deltaT := float64(loc1.Timestamp) - float64(loc2.Timestamp)
+	//Superman is infinitely fast
+	if deltaT == 0 {
+		return SUPERMAN + 1
+	}
+	return math.Abs((dis / deltaT) * KMS_TO_MPH)
 }
 
-//kms/sec -> miles/hours
+func IsSuperMan(speed float64) bool {
+	return speed >= SUPERMAN
+}

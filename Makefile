@@ -1,17 +1,17 @@
 WD = $(shell pwd)
 
-INT_CONTAINER_NAME = secureworks_integration
-APP_CONTAINER_NAME = secureworks_assessment
-BIN_CONTAINER_NAME = secureworks_binary
-DATABASE_CONTAINER_NAME = secureworks_database
-SOURCER_CONTAINER_NAME = secureworks_sourcer
-VENDOR_CONTAINER_NAME = secureworks_vendor
-TEST_CONTAINER_NAME = secureworks_tester
+INT_IMAGE_NAME = secureworks_integration_dale
+APP_IMAGE_NAME = secureworks_assessment_dale
+BIN_IMAGE_NAME = secureworks_binary_dale
+DATABASE_IMAGE_NAME = secureworks_database_dale
+SOURCER_IMAGE_NAME = secureworks_sourcer_dale
+VENDOR_IMAGE_NAME = secureworks_vendor_dale
+TEST_IMAGE_NAME = secureworks_tester_dale
 
-BUILD_DIR = build
+APP_CONTAINER_NAME = ${APP_IMAGE_NAME}_container
+
 VENDORED_SRC = ${WD}/${BUILD_DIR}/src
 VENDOR = ${BUILD_DIR}/vendor
-
 
 export HOST_IP_DB = ips/GeoLite2-City.mmdb
 export CONT_IP_DB = /root/maxmind/ips.mndb
@@ -22,10 +22,10 @@ export GEN_GO = /go/src/secureworks/constants/constants.go
 export SQL_DB = /root/secureworks_db
 export VENDOR_DIR = /root/vendor_dir
 export CREATE_DB_SQL = /root/createdb.sql
-export PORT_STR = :8080
+export PORT = 8080
 export TEST_SHELL = /root/test.sh
 
-all: $(BUILD_DIR) ## All the things
+all: ## All the things, runs docker container prune -f, be careful
 	@docker build                     \
 		--build-arg HOST_IP_DB        \
 		--build-arg CONT_IP_DB        \
@@ -36,8 +36,11 @@ all: $(BUILD_DIR) ## All the things
 		--build-arg VENDOR_DIR        \
 		--build-arg SQL_DB            \
 		--build-arg CREATE_DB_SQL     \
-		--build-arg PORT_STR          \
-		-t ${APP_CONTAINER_NAME} .  
+		--build-arg PORT              \
+		-t ${APP_IMAGE_NAME} .  
+	@scripts/kill.sh ${APP_CONTAINER_NAME}
+	@docker container prune -f
+	@docker run -d -p ${PORT}:${PORT} --name ${APP_CONTAINER_NAME} ${APP_IMAGE_NAME}
 .PHONY: all
 
 builder: ## makes the binary only
@@ -51,32 +54,16 @@ builder: ## makes the binary only
 		--build-arg VENDOR_DIR        \
 		--build-arg SQL_DB            \
 		--build-arg CREATE_DB_SQL     \
-		--build-arg PORT_STR          \
-		-t ${BIN_CONTAINER_NAME}      \
+		--build-arg PORT              \
+		-t ${BIN_IMAGE_NAME}          \
 		--target builder .
 .PHONY: builder
-
-integration: ## generates a shell script to be thrown at the application for final testing
-	@docker build                     \
-		--build-arg HOST_IP_DB        \
-		--build-arg CONT_IP_DB        \
-		--build-arg APP_SRC           \
-		--build-arg CONT_BIN          \
-		--build-arg CONT_GEN_SCRIPT   \
-		--build-arg GEN_GO            \
-		--build-arg VENDOR_DIR        \
-		--build-arg SQL_DB            \
-		--build-arg CREATE_DB_SQL     \
-		--build-arg PORT_STR          \
-		--build-arg TEST_SHELL        \
-		-t ${INT_CONTAINER_NAME}      \
-		--target integration .
 
 database: ## provisions the database only, mostly for testing
 	@docker build                     \
 		--build-arg SQL_DB            \
 		--build-arg CREATE_DB_SQL     \
-		-t ${DATABASE_CONTAINER_NAME} \
+		-t ${DATABASE_IMAGE_NAME} \
 		--target database .
 .PHONY: database
 
@@ -95,7 +82,8 @@ test: ## Run the testing suite only
 		--build-arg VENDOR_DIR        \
 		--build-arg SQL_DB            \
 		--build-arg CREATE_DB_SQL     \
-		-t ${TEST_CONTAINER_NAME}     \
+		--build-arg PORT              \
+		-t ${TEST_IMAGE_NAME}         \
 		--target tester .  
 .PHONY: test
 	
@@ -104,16 +92,13 @@ help: ## Print this helpfile
 .PHONY: help
 
 clean:
-	@rm -rf $(BUILD_DIR)
-	@docker image rm -f ${INT_CONTAINER_NAME}
-	@docker image rm -f ${APP_CONTAINER_NAME}
-	@docker image rm -f ${BIN_CONTAINER_NAME}
-	@docker image rm -f ${DATABASE_CONTAINER_NAME}
-	@docker image rm -f ${SOURCER_CONTAINER_NAME}
-	@docker image rm -f ${VENDOR_CONTAINER_NAME}
-	@docker image rm -f ${TEST_CONTAINER_NAME}
+	@docker image rm -f ${INT_IMAGE_NAME}
+	@docker image rm -f ${APP_IMAGE_NAME}
+	@docker image rm -f ${BIN_IMAGE_NAME}
+	@docker image rm -f ${DATABASE_IMAGE_NAME}
+	@docker image rm -f ${SOURCER_IMAGE_NAME}
+	@docker image rm -f ${VENDOR_IMAGE_NAME}
+	@docker image rm -f ${TEST_IMAGE_NAME}
 	@docker builder prune -f
+	@docker container prune -f
 .PHONY: clean
-
-$(BUILD_DIR):
-	@mkdir $@

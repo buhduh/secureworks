@@ -2,13 +2,8 @@ package event
 
 import (
 	"fmt"
+	"sort"
 )
-
-/*
-	Just about all packages in this project
-	will need this, just centralize it in its own
-	package
-*/
 
 type Location struct {
 	Latitude  float64
@@ -30,6 +25,44 @@ func NewLocation(lat float64, lon float64, rad uint) *Location {
 		Longitude: lon,
 		Radius:    rad,
 	}
+}
+
+//Get SurroundingEvents is MUST be in order
+//an error if e is not in events
+//0th return is preceeding event
+//1st return is event
+//2nd return is proceeding
+//preceeding and proceeding can be nil
+//timestamps can't be identical for events
+func (e *Event) GetSurroundingEvents(events []*Event) ([3]*Event, error) {
+	toRet := [3]*Event{}
+	if len(events) == 0 {
+		return toRet, fmt.Errorf("passed len(events) == 0")
+	}
+	index := sort.Search(
+		len(events),
+		func(i int) bool {
+			return events[i].Timestamp >= e.Timestamp
+		},
+	)
+	if index == len(events) {
+		return toRet,
+			fmt.Errorf(
+				"could not locate event with timestamp %d",
+				e.Timestamp,
+			)
+	}
+	if e.EventUUID != events[index].EventUUID {
+		return toRet, fmt.Errorf("event uuids do not match!!!")
+	}
+	if index > 0 {
+		toRet[0] = events[index-1]
+	}
+	toRet[1] = events[index]
+	if index+1 < len(events) {
+		toRet[2] = events[index+1]
+	}
+	return toRet, nil
 }
 
 //TODO, I should probably validate this

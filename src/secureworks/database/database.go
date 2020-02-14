@@ -7,6 +7,11 @@ import (
 	"secureworks/event"
 )
 
+const (
+	//The "correct" approach for this would be to verify error codes
+	DUPE_ERROR string = "UNIQUE constraint failed: events.event_uuid"
+)
+
 type Database interface {
 	NewEvent(*event.Event) error
 	//ordered by timestamp ascending, oldest at index 0
@@ -47,7 +52,8 @@ func (r *realDatabase) NewEvent(e *event.Event) error {
 		e.Location.Latitude, e.Location.Longitude,
 		e.Location.Radius, e.UserName,
 	)
-	if err != nil {
+
+	if err != nil && err.Error() != DUPE_ERROR {
 		return err
 	}
 	return nil
@@ -73,7 +79,7 @@ func (r *realDatabase) GetOrderedEventsForUser(name string) ([]*event.Event, err
 	//why can't rows have a length?
 	toRet := make([]*event.Event, 0)
 	var ip, uName, eUUID string
-	var lat, lon float32
+	var lat, lon float64
 	var rad, time uint
 	for rows.Next() {
 		rows.Scan(&ip, &time, &uName, &eUUID, &lat, &lon, &rad)
