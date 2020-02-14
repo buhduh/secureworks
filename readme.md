@@ -39,3 +39,5 @@ I would have preferred using alpine:latest but it requries disabling CGO to forc
 Deploying against ubuntu:latest exposed an issue with glibc on Ubuntu 18.04, luckily Ubuntu 20.04 came with a compatible glibc binary.
 
 All other golang libraries are from "core" golang.
+
+Tested on Kubuntu 18.04 and macOS Sierra Version 10.12.6
